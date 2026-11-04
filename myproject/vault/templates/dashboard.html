@@ -1,0 +1,42 @@
+{% extends 'vault/base.html' %}
+
+{% block content %}
+<h2>Document Repository</h2>
+
+<form method="GET" style="margin-bottom: 20px;">
+    <input type="text" name="q" placeholder="Search documents by title or category..." value="{{ request.GET.q }}">
+    <button type="submit" class="btn" style="margin-top: 5px;">Search</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Owner</th>
+            <th>Created At</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for doc in documents %}
+        <tr>
+            <td><strong>{{ doc.title }}</strong></td>
+            <td>{{ doc.category }}</td>
+            <td>{{ doc.owner.username }}</td>
+            <td>{{ doc.created_at|date:"Y-m-d H:i" }}</td>
+            <td>
+                <a href="{% url 'secure_download' doc.id %}" class="btn">Download/View</a>
+                {% if doc.owner == user or user.userprofile.role == 'ADMIN' %}
+                    <a href="{% url 'manage_permissions' doc.id %}" class="btn" style="background-color: #805ad5;">Permissions</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5">No accessible documents found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
